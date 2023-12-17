@@ -5,7 +5,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.listen(5000);
+app.listen(7300);
 
 async function main(){
 
@@ -36,6 +36,6 @@ async function updateAllPenaltiesToHaveStatus(client){
     const result = await client.db("Pen").collection("Penalty Info").updateMany({status:{ $exists : false }},{ $set:{ status : false }});//if status property does not exist in the entry/IT SHOULNDT/, create it and set it to falseuntil payment.
 };
 async function adjustDateOfPenaltyCreation(client){
-    var date_time = new Date().toDateString();
+    var date_time = new Date();
     const result = await client.db("Pen").collection("Penalty Info").updateMany({date: { $exists : false }},{ $set:{ date : date_time}});//if date property does not exist in the entry/IT SHOULDNT/, create it and set it to the time at input.
 }; 

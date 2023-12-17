@@ -2,8 +2,9 @@ import {MongoClient} from 'mongodb';
 import express from 'express';
 import bodyParser from 'body-parser';
 import moment from 'moment';
+import cors from 'cors';
 const app = express();
-
+app.use(cors());
 app.use(bodyParser.json());
 
 app.listen(5000);
@@ -16,15 +17,6 @@ async function main(){
 
     try{
         await client.connect();
-
-        //app.use('/generateReport', (req, res, next) => {
-           // const { startDate, endDate } = req.body;
-            //if (!startDate || !endDate) {
-                //return res.status(400).send({ message: 'start Date and end Date are required' });
-            //}
-            //next();
-        //});
-
         app.post('/generateReport', (req,res) => {
             const { startDate, endDate } = req.body;
             if (!startDate || !endDate) {
@@ -47,23 +39,10 @@ async function reportGeneration(client, req, res) {
         const start = moment(req.body.startDate, 'YYYY-MM-DD');
         const end = moment(req.body.endDate, 'YYYY-MM-DD');
         
-        /*let current = moment(start);
-        
-        const penalties = [];
-
-        while(current<=end){
-            const penalty = await client
-            .db("Pen")
-            .collection("Penalty Info")
-            .find({date : {$eq:current}}).toArray();
-            penalties.push(...penalty);
-            current.add(1, 'days');
-        };*/
-        
         let grade = 1;
         let allPenalties = [];
         let allPenaltiesByGrade = [];
-        
+      
         while (grade <= 6) {
           const penalties = await client
             .db('Pen')
@@ -76,12 +55,13 @@ async function reportGeneration(client, req, res) {
               ],
             })
             .toArray();
-        
+          const payMent = ((grade * 100) - (grade - 1)*50);
           allPenalties = allPenalties.concat(penalties);
           allPenaltiesByGrade.push({
             grade: grade,
             count: penalties.length,
-            penalties: penalties,
+            paymentCount: penalties.length*payMent
+            
           });
         
           grade++;

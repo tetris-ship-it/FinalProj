@@ -125,8 +125,20 @@ async function main(){
             Sex:"Female",
             Blood_Type:"O+",
             Tel:"0934214533",
-            Issue_Date:"12/2/1995",
+            Issue_Date:"12/02/1995",
             Expiry_Date:"03/10/2023"
+        },
+        {
+            firstName:"Zalbo",
+            lastName:"Wossen",
+            licenseID:"892341",
+            DOB:"09/23/1955",
+            Nationality:"Portugese",
+            Sex:"Male",
+            Blood_Type:"A-",
+            Tel:"0939161678",
+            Issue_Date:"04/10/1997",
+            Expiry_Date:"05/05/2025"
         }
         ])
         await updateAllDriversToHaveGrade(client);

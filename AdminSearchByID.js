@@ -1,11 +1,12 @@
 import {MongoClient} from 'mongodb';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 const app = express();
-
+app.use(cors());
 app.use(bodyParser.json());
 
-app.listen(5000);
+app.listen(5200);
 async function main(){
 
     const url="mongodb+srv://beldan:ilovelaraLOL20@cluster0.zatwth5.mongodb.net/Driver Info?retryWrites=true&w=majority";
@@ -14,9 +15,10 @@ async function main(){
 
     try{
         await client.connect();
-        app.get('/Searchbyid', (req,res)=>{
+        app.get('/searchById', (req,res)=>{
              displayDriver(client, req, res);
         });
+
     }
     catch(err){
         console.log(err);
@@ -27,21 +29,20 @@ async function main(){
 main().catch(console.error);
 
 async function displayDriver(client, req, res){
-   // const cursor= await client.db("Pen").collection("Driver Info").find({ 
-       // licenseID:{ $eq:req.body.licenseId }//gather from collection based on equality with this field's value
- // });
- const variable = req.body.licenseID
+
+ try{
+ const variable = req.body.licenseId;
  const cursor = await client.db('Pen').collection('Driver Info').aggregate([
     {
       $lookup: {
         from: 'Penalty Info',
         let: { licenseID: variable },
-        pipeline: [
+        pipeline: [//this specifies an array of stages to be applied to the penalty info collection
           {
             $match: {
               $expr: {
                 $and: [
-                  { $eq: ['$licenseID', variable] }//left element is the penalty one and right is the driver
+                  { $eq: ['$licenseID', '$$licenseID'] }//if the licenseID property in the penalty info table/collection matches the one retrieved from the request
                  
                 ]
               }
@@ -52,19 +53,19 @@ async function displayDriver(client, req, res){
       }
     },
     {
-      $match: {
-        $and: [
-
-          { 'licenseID': { $exists: true } }
-        ]
+      $match: {//this specifies filtering for the driver info based on the variable "variable"
+          licenseID: variable
       }
     },
-    //{
-      //$limit: parseInt(req.body.limit)
-    //}
+
   ]);
 
     await cursor.forEach((myDoc) => {
           res.send(myDoc);
      });
+    }
+    catch(err){
+      res.json("license ID not found")
+    }
 };
+

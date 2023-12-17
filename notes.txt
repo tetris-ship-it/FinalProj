@@ -1,2 +1,0 @@
-1.add a button on the complaint page to change the seenStatus property of the database
-2.
